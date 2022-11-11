@@ -3,12 +3,14 @@
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import Header from './components/Header.vue';
 import Main from './components/Main.vue';
+import MainCanvas from './components/MainCanvas.vue';
 </script>
 
 <template>
   <div>
     <Header />
     <Main />
+    <MainCanvas />
   </div>
 </template>
 
