@@ -10,7 +10,7 @@
                     <p>Drop your  File here!</p>
                     <p>Up to 1 File, max 2 MB each</p>
                 </div>
-                <input type="file" />
+                <input type="file"  @change="upPdfImg" />
             </div>
         </li>
         <li >Step 2: 新增線上簽名
@@ -32,7 +32,15 @@
 </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { jsPDF } from "jspdf";
+
+
+
+const upPdfImg = () =>{
+
+}
+</script>
 
 <style  scoped>
 .main{
