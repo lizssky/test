@@ -12,22 +12,28 @@
             <input type="color" @change="chgPenColor" class="max-w-8 ml-5"/>
             <p class="text-blue-400 cursor-pointer" @click="clearCanvans" > 重新繪製</p>
             <p class="text-blue-400 cursor-pointer  ml-5" @click="doneImg" > 完成簽名檔</p>
+            <p class="text-blue-400 cursor-pointer  ml-5" @click="donePDF" > 下載PDF</p>
+
         </div>
     </div>
   <canvas ref="canvans" height="300" width="300" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp"></canvas>
-  <img src="" id="imgConverted" class="w-[350px] h-[350px] border-dotted m-auto mt-5">
+  <img :src=imgSrc  class="w-[300px] h-[300px] border-dotted m-auto mt-5" >
 </div>
 </template>
 
 <script setup lang="ts">
 import { ref,onMounted } from "vue";
+import { jsPDF } from "jspdf";
+
+
+
 const canvans = ref<HTMLCanvasElement>()
 let isMouseClick = false
 const penSize = ref(3)
 let color = "#000"
 let x1 = 0
 let y1 = 0
-
+let imgSrc=ref("")
 
 
 const DrawCirCle = (x1:number, y1:number,x2:number , y2:number)=>{
@@ -39,14 +45,28 @@ const DrawCirCle = (x1:number, y1:number,x2:number , y2:number)=>{
         ctx.lineTo(x2,y2)
         ctx.lineWidth = penSize.value
         ctx.strokeStyle =color
+        ctx.shadowBlur = 1;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
         ctx.stroke();
+        doneImg();
   };
 }
 
 const doneImg = () =>{
     const dataURI = canvans.value?.toDataURL()
-    console.log("dataURI",dataURI);
-   
+    if(dataURI){
+        imgSrc.value = dataURI
+    }
+}
+
+const donePDF = () =>{
+    let doc = new jsPDF();
+    const dataURI = canvans.value?.toDataURL()
+    if(dataURI&&canvans.value){
+        doc.addImage(dataURI,'JPEG', 0, 0, canvans.value.width, canvans.value.height);
+        doc.save('helloworld.pdf');
+    }
 }
 
 const clearCanvans = () =>{
@@ -54,6 +74,10 @@ const clearCanvans = () =>{
     if(ctx&&canvans.value){
         ctx.fillStyle = "#fff"
         ctx.fillRect(0,0,canvans.value.width,canvans.value.height)
+    }
+
+    if(imgSrc.value){
+        imgSrc.value =""
     }
 
 }

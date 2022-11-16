@@ -1,6 +1,6 @@
 <template>
     
-<div class="header">
+<div class="topheader">
     <img src="images/logo.jpg" />
     PDF線上簽名,本網站 僅供學術交流參考
 </div>
@@ -9,13 +9,11 @@
 <script setup lang="ts"></script>
 
 <style scoped>
-.header{
+.topheader{
     @apply
     flex
     items-center
-    justify-center
-    m-5
-    
+    p-3
     ;
 
     img{
