@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Header from './components/Header.vue';
+import MainVue from './components/Main.vue';
 
 
 </script>
@@ -7,15 +8,17 @@ import Header from './components/Header.vue';
 <template>
   <div>
     <Header />
-    <div class="menu">
-    </div>
     <router-view />
   </div>
 </template>
 
 <style scoped>
-
-
+.menu{
+  @apply
+    absolute
+    right-0
+  ;
+}
 
 body{
    font-family: Arial, Helvetica, sans-serif;

@@ -1,24 +1,27 @@
 <template>
     <div class="temp1">
+       
         Step 1: 上傳檔案
             <div class="main_step1">
                 <font-awesome-icon icon="upload" class="upload"  />
                 <div class="upText">
                     <p>Drop your  File here!</p>
                     <p>Up to 1 File, max 2 MB each</p>
+                   
                 </div>
                 <input type="file"   accept=".pdf"  @change="getFile" />
             </div>
-        <canvas ref="canvans" width={canvasSize} height={canvasSize}></canvas>
+      
+        <canvas ref="canvans" width={{canvasSize}} height={{canvasSize}} class="pdfCanvans"></canvas>
     </div>
 </template>
 <script setup lang="ts">
 import jsPDF from 'jspdf';
 import { onMounted, ref } from 'vue';
+import store from '../store';
 
 import * as PDFJS from 'pdfjs-dist'
 PDFJS.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS.version}/pdf.worker.js`;
-
 
 const canvans = ref<HTMLCanvasElement>()
 
@@ -34,7 +37,6 @@ const getFile = (event:Event) =>{
         let reader  = new FileReader();
     
         reader.onload = (e) =>{
-          
             if(e.target){
                 let pdfData = new Uint8Array(e.target.result as ArrayBuffer);
                 const loadingTask = PDFJS.getDocument({ data: pdfData });
@@ -68,16 +70,8 @@ const getFile = (event:Event) =>{
         reader.readAsArrayBuffer(file);
     }
    
-    console.log('files: ', (event.target as HTMLInputElement)?.files?.[0]);
    
 }
-
-   
-
-
-
-
-
 
 
 
@@ -90,6 +84,14 @@ const getFile = (event:Event) =>{
     max-w-[400px]
     m-auto
     mt-20
+}
+
+.pdfCanvans{
+    @apply
+    absolute
+    top-30
+    left-0
+    ;
 }
 
 .main_step1{
