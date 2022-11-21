@@ -1,5 +1,6 @@
 <template>
     <div class="temp1">
+        <div v-if="showStepOne">
        
         Step 1: 上傳檔案
             <div class="main_step1">
@@ -11,27 +12,31 @@
                 </div>
                 <input type="file"   accept=".pdf"  @change="getFile" />
             </div>
-      
+        </div>
         <canvas ref="canvans" width={{canvasSize}} height={{canvasSize}} class="pdfCanvans"></canvas>
     </div>
 </template>
 <script setup lang="ts">
 import jsPDF from 'jspdf';
 import { onMounted, ref } from 'vue';
-import store from '../store';
-
+import common from '../stores/common';
+import { storeToRefs } from "pinia";
 import * as PDFJS from 'pdfjs-dist'
 PDFJS.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS.version}/pdf.worker.js`;
-
 const canvans = ref<HTMLCanvasElement>()
-
+const showStepOne = ref(true)
+const commonStore = common();
+    
 const getFile = (event:Event) =>{
     const ctx = canvans.value?.getContext("2d");
     const { files } = event.target as HTMLInputElement;
     if (!files) return;
     const file = files[0]
- 
-    
+    commonStore.updPDF(file)
+    const { PDFFFile } = storeToRefs(commonStore);
+
+    console.log("type", PDFFFile);
+   
     if(file.type == "application/pdf"){
         
         let reader  = new FileReader();
@@ -42,6 +47,7 @@ const getFile = (event:Event) =>{
                 const loadingTask = PDFJS.getDocument({ data: pdfData });
                 loadingTask.promise.then((pdf)=>{
                     const pageNumber = 1
+                    showStepOne.value = false
                     pdf.getPage(pageNumber).then((page)=>{
                         const scale = 1.5;
                         const viewport = page.getViewport({ scale: scale });
@@ -59,7 +65,7 @@ const getFile = (event:Event) =>{
                         const renderTask = page.render(renderContext);
                         // const renderTask = page.render(renderContext);
                         renderTask.promise.then(()=>{
-                            console.log("Page rendered");
+                           
                         })
                     })
                 })
