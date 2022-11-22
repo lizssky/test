@@ -1,7 +1,6 @@
 <template>
     <div class="temp1">
         <div v-if="showStepOne">
-       
         Step 1: 上傳檔案
             <div class="main_step1">
                 <font-awesome-icon icon="upload" class="upload"  />
@@ -13,7 +12,9 @@
                 <input type="file"   accept=".pdf"  @change="getFile" />
             </div>
         </div>
+        <MainCanvas v-if="!showStepOne"  :donePDF="donePDF" :showSing="showSing"/>
         <canvas ref="canvans" width={{canvasSize}} height={{canvasSize}} class="pdfCanvans"></canvas>
+        <MoveSign  v-if="showSign" :wC="wC" :HC="HC" />
     </div>
 </template>
 <script setup lang="ts">
@@ -22,13 +23,35 @@ import { onMounted, ref } from 'vue';
 import common from '../stores/common';
 import { storeToRefs } from "pinia";
 import * as PDFJS from 'pdfjs-dist'
+import MoveSign from '../components/MoveSign.vue';
+
+import MainCanvas from '../components/MainCanvas.vue';
 PDFJS.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS.version}/pdf.worker.js`;
 const canvans = ref<HTMLCanvasElement>()
 const showStepOne = ref(true)
+const showSign = ref(false)
 const commonStore = common();
+
+const wC = ref(0)
+const HC = ref(0)
+
+
+const donePDF = () =>{
+    let doc = new jsPDF();
+    const dataURI = canvans.value?.toDataURL()
+    if(dataURI&&canvans.value){
+        doc.addImage(dataURI,'JPEG', 0, 0, canvans.value.width, canvans.value.height);
+        doc.save('helloworld.pdf');
+    }
+}
+
+const showSing = () =>{
+    showSign.value =true
+}
     
 const getFile = (event:Event) =>{
     const ctx = canvans.value?.getContext("2d");
+   
     const { files } = event.target as HTMLInputElement;
     if (!files) return;
     const file = files[0]
@@ -55,6 +78,12 @@ const getFile = (event:Event) =>{
                         if(canvans.value){
                             canvans.value.height = viewport.height;
                             canvans.value.width = viewport.width;
+                            wC.value=viewport.width;
+                            HC.value=viewport.height;
+                         
+
+                            console.log("viewport.height", viewport.width,viewport.height);
+                            
                         }
 
                         const renderContext = {
@@ -65,6 +94,7 @@ const getFile = (event:Event) =>{
                         const renderTask = page.render(renderContext);
                         // const renderTask = page.render(renderContext);
                         renderTask.promise.then(()=>{
+
                            
                         })
                     })

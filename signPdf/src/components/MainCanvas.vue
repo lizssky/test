@@ -1,30 +1,41 @@
 
 
 <template>
-    
-<div class="mainCanvas">
-    <div class=" max-w-lg m-auto ">
-        請選擇筆芯大小,及顏色
+<div class="absolute  left-0 h-full w-full z-10">
+
+<div class="mainCanvas ">
+    <div class="max-w-lg m-auto ">
+        Step 2:填上簽名擋
+       
         <div class="flex items-center">
+            請選擇筆芯大小,及顏色
             <button @click="addPen" class="p-2 bg-gray-300 max-h-6 flex items-center"> + </button>
             <p class="w-10 flex items-center justify-center"> {{penSize}} </p>
             <button @click="cutPen" class="p-2 bg-gray-300 max-h-6 flex items-center"> - </button>
             <input type="color" @change="chgPenColor" class="max-w-8 ml-5"/>
-            <p class="text-blue-400 cursor-pointer" @click="clearCanvans" > 重新繪製</p>
+            
+        </div>
+        <div class="flex items-center">
+        <p class="text-blue-400 cursor-pointer" @click="clearCanvans" > 重新繪製</p>
             <p class="text-blue-400 cursor-pointer  ml-5" @click="doneImg" > 完成簽名檔</p>
-            <p class="text-blue-400 cursor-pointer  ml-5" @click="donePDF" > 下載PDF</p>
-
+            <p class="text-blue-400 cursor-pointer  ml-5" @click="props.donePDF" > 下載PDF</p>
         </div>
     </div>
-  <canvas ref="canvans" height="300" width="300" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp"></canvas>
-  <img :src=imgSrc  class="w-[300px] h-[300px] border-dotted m-auto mt-5" >
+  <canvas class="bg-white" ref="canvans" height="100" width="300" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp"></canvas>
+  <img :src=imgSrc  class=" bg-white w-[300px] h-[100px] border-dotted m-auto mt-5" >
+</div>
 </div>
 </template>
 
 <script setup lang="ts">
 import { ref,onMounted } from "vue";
+import common from '../stores/common';
 import { jsPDF } from "jspdf";
-
+const props = defineProps({
+    donePDF:Function,
+    showSing:Function,
+})
+const commonStore = common();
 
 
 const canvans = ref<HTMLCanvasElement>()
@@ -34,7 +45,6 @@ let color = "#000"
 let x1 = 0
 let y1 = 0
 let imgSrc=ref("")
-
 
 const DrawCirCle = (x1:number, y1:number,x2:number , y2:number)=>{
     let ctx = canvans.value?.getContext("2d");
@@ -49,7 +59,6 @@ const DrawCirCle = (x1:number, y1:number,x2:number , y2:number)=>{
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
         ctx.stroke();
-        doneImg();
   };
 }
 
@@ -57,15 +66,8 @@ const doneImg = () =>{
     const dataURI = canvans.value?.toDataURL()
     if(dataURI){
         imgSrc.value = dataURI
-    }
-}
-
-const donePDF = () =>{
-    let doc = new jsPDF();
-    const dataURI = canvans.value?.toDataURL()
-    if(dataURI&&canvans.value){
-        doc.addImage(dataURI,'JPEG', 0, 0, canvans.value.width, canvans.value.height);
-        doc.save('helloworld.pdf');
+        commonStore.updSingImg(imgSrc.value)
+        props?.showSing?.();
     }
 }
 
@@ -79,7 +81,6 @@ const clearCanvans = () =>{
     if(imgSrc.value){
         imgSrc.value =""
     }
-
 }
 
 const addPen=()=>{
@@ -100,8 +101,6 @@ const cutPen=()=>{
         penSize.value=3
     }
 }
-
-
 
 const mouseMove = (e:MouseEvent)=>{
     if(isMouseClick){
@@ -130,11 +129,24 @@ onMounted(()=>{
     // DrawCirCle(10,50);
 })
 
+
+
 </script>
 
 
 
 <style scoped>
+
+.mainCanvas{
+    @apply
+    absolute 
+    right-9 
+    max-w-[400px]
+    bg-gray-100
+    p-10
+    
+    ;
+}
 canvas{
     @apply
     border-gray-500 
